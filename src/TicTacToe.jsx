@@ -1,55 +1,46 @@
 import React, { useState, useEffect } from "react";
 
+const SYMBOLS = ["X", "O"];
+// positions that if all are equal means a win
+const WINNER_LINES = [
+  [3, 4, 5],
+  [6, 7, 8],
+  [0, 3, 6],
+  [1, 4, 7],
+  [2, 5, 8],
+  [0, 4, 8],
+  [6, 4, 2],
+];
+
 function TicTac() {
-  const [placeHolders, setPlaceHolders] = useState(Array.from({ length: 9 }));
-  const [shuffleCharacters, setShuffleCharacteres] = useState(["x", "O"]);
-  const [showChar, setShowChar] = useState(false);
+  const [grid, setGrid] = useState(Array.from({ length: 9 }));
+  const [isWin, setIsWin] = useState(false);
 
   useEffect(() => {
-    console.log(placeHolders);
-    let isXWinner;
-    let isOWinner;
+    let isWinner = WINNER_LINES.some(
+      ([a, b, c]) => grid[a] && (grid[a] === grid[b]) & (grid[a] === grid[c])
+    );
+    setIsWin(isWinner);
+  }, [grid]);
 
-    const winnerLines = [
-      [0, 1, 2],
-      [3, 4, 5],
-      [6, 7, 8],
-      [0, 3, 6],
-      [1, 4, 7],
-      [2, 5, 8],
-      [0, 4, 8],
-      [6, 4, 2],
-    ];
-    for (let i = 0; i < winnerLines.length; i++) {
-      const [a, b, c] = winnerLines[i];
-      const isWinnerLine = [placeHolders[a], placeHolders[b], placeHolders[c]];
-      isXWinner = isWinnerLine.every((el) => el === "x");
-      isOWinner = isWinnerLine.every((el) => el === "O");
-    }
-    if (isXWinner || isOWinner) {
+  useEffect(() => {
+    if (isWin) {
       alert("you win honey");
-      setPlaceHolders(Array.from({ length: 9 }));
+      setGrid(Array.from({ length: 9 }));
+      setIsWin(false);
     }
-  }, [placeHolders]);
+  }, [isWin]);
 
-  function getRandomCharacter(e, i) {
+  function handleClick(e, i) {
     e.preventDefault();
-    setShowChar((prev) => !prev);
-    setShuffleCharacteres((prev) => {
-      const randomChars = [...prev].sort(() => 0.5 - Math.random());
-      return randomChars;
-    });
-
-    setPlaceHolders((prev) => {
-      let arrWithClickedElement = [...prev];
-      if (showChar) {
-        arrWithClickedElement[i] = shuffleCharacters[0];
-      } else {
-        arrWithClickedElement[i] = "";
-      }
-
-      return arrWithClickedElement;
-    });
+    if (!grid[i]) {
+      setGrid((prev) => {
+        const move = grid.filter((v) => v).length % 2;
+        let newGrid = [...prev];
+        newGrid[i] = SYMBOLS[move];
+        return newGrid;
+      });
+    }
   }
 
   return (
@@ -62,11 +53,11 @@ function TicTac() {
         width: "50%",
       }}
     >
-      {placeHolders.map((el, i) => {
+      {grid.map((el, i) => {
         return (
           <div
             key={i}
-            onClick={(e) => getRandomCharacter(e, i)}
+            onClick={(e) => handleClick(e, i)}
             style={{
               borderRight: "1px solid black",
               borderBottom: "1px solid black",
