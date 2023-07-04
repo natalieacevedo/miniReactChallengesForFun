@@ -10,8 +10,8 @@ function CounterProvider({ children }) {
 
   function decrement() {
     setCount((prev) => {
-      if (prev >= 0) {
-        return (prev += 1);
+      if (prev > 0) {
+        return (prev -= 1);
       }
       return 0;
     });
@@ -24,4 +24,4 @@ function CounterProvider({ children }) {
   );
 }
 
-export default CounterProvider;
+export { CounterProvider, CountContext };
